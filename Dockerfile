@@ -3,6 +3,7 @@ FROM python:3.9-slim
 WORKDIR /auto-blog/app
 
 COPY ./pyproject.toml ./poetry.lock ./
+COPY ./.flake8 ./
 
 RUN pip install --upgrade pip && \
     pip install poetry && \

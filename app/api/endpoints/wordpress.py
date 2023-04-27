@@ -32,11 +32,11 @@ class PostData(BaseModel):
     wp_user_name: str
     wp_password: str
     title: str
-    status: Literal['publish', 'draft']
+    status: Literal["publish", "draft"]
 
 
 class LLMConfig(BaseModel):
-    model_name: str = 'text-davinci-002'
+    model_name: str = "text-davinci-002"
     template: str = template
     temperature: float = 0.7
     max_tokens: int = 1024
@@ -58,14 +58,14 @@ def create_wordpress_post_from_title(request: AutoPostRequest):
         max_tokens=request.llm_config.max_tokens,
     )
     prompt = PromptTemplate(
-        input_variables=['title'],
+        input_variables=["title"],
         template=request.llm_config.template,
     )
     llm_result = llm(prompt.format(title=request.post_data.title))
     wp_client = Client(
         request.post_data.wp_url,
         request.post_data.wp_user_name,
-        request.post_data.wp_password
+        request.post_data.wp_password,
     )
 
     post = WordPressPost()
