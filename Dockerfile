@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-WORKDIR /app
+WORKDIR /auto-blog/app
 
 COPY ./pyproject.toml ./poetry.lock ./
 
@@ -9,8 +9,7 @@ RUN pip install --upgrade pip && \
     poetry config virtualenvs.create false && \
     poetry install --no-dev
 
-COPY ./app /app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

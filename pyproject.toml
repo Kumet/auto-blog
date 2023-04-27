@@ -8,6 +8,7 @@ authors = ["m.kumeta <m.kumeta@nakamu-farm.com>"]
 python = "^3.9"
 fastapi = "^0.95.1"
 uvicorn = "^0.21.1"
+python-wordpress-xmlrpc = "^2.3"
 
 [tool.poetry.dev-dependencies]
 
