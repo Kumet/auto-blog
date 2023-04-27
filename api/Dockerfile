@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-WORKDIR /auto-blog/app
+WORKDIR /api/app
 
 COPY ./pyproject.toml ./poetry.lock ./
 COPY ./.flake8 ./
