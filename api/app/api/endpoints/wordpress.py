@@ -50,6 +50,11 @@ class AutoPostRequest(BaseModel):
 router = APIRouter()
 
 
+@router.post("/wordpress/test")
+def test_api(request: AutoPostRequest):
+    print(request)
+    return 'test content'
+
 @router.post("/wordpress/post")
 def create_wordpress_post_from_title(request: AutoPostRequest):
     llm = OpenAI(
