@@ -22,7 +22,7 @@ interface Page {
 }
 
 const MyAppBar = () => {
-    const pages: Page[] = [{label: 'home', path: ''}, {label: 'site info', path: '/site'}]
+    const pages: Page[] = [{label: 'home', path: '/'}, {label: 'site info', path: '/site'}]
     return (
         <Stack sx={{flexGrow: 1}}>
             <ThemeProvider theme={darkTheme}>
