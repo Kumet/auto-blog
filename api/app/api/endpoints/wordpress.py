@@ -34,6 +34,7 @@ class PostData(BaseModel):
     title: str
     status: Literal["publish", "draft", "check"]
 
+
 class PostContentData(BaseModel):
     wp_url: str
     wp_user_name: str
@@ -61,7 +62,8 @@ router = APIRouter()
 @router.post("/wordpress/test")
 def test_api(request: AutoPostRequest):
     print(request)
-    return 'test content'
+    return "test content"
+
 
 @router.post("/wordpress/post")
 def create_post(request: PostContentData):
@@ -81,9 +83,10 @@ def create_post(request: PostContentData):
         # wp_client.call(NewPost(post))
         post_id = wp_client.call(NewPost(post))
         print(post_id)
-        return 'Post successfully created on WordPress'
+        return "Post successfully created on WordPress"
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/wordpress/title_post")
 def create_wordpress_post_from_title(request: AutoPostRequest):
@@ -98,7 +101,7 @@ def create_wordpress_post_from_title(request: AutoPostRequest):
     )
     llm_result = llm(prompt.format(title=request.post_data.title))
 
-    if request.post_data.status == 'check':
+    if request.post_data.status == "check":
         return llm_result
 
     wp_client = Client(
@@ -114,7 +117,7 @@ def create_wordpress_post_from_title(request: AutoPostRequest):
 
     try:
         # wp_client.call(NewPost(post))
-        post_id = wp_client.call(NewPost(post))
+        wp_client.call(NewPost(post))
         return llm_result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
