@@ -11,6 +11,8 @@ services:
       - ./api:/api
     environment:
       - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
   web:
     build:
       context: web

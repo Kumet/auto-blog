@@ -32,7 +32,15 @@ class PostData(BaseModel):
     wp_user_name: str
     wp_password: str
     title: str
+    status: Literal["publish", "draft", "check"]
+
+class PostContentData(BaseModel):
+    wp_url: str
+    wp_user_name: str
+    wp_password: str
+    title: str
     status: Literal["publish", "draft"]
+    content: str
 
 
 class LLMConfig(BaseModel):
@@ -56,6 +64,28 @@ def test_api(request: AutoPostRequest):
     return 'test content'
 
 @router.post("/wordpress/post")
+def create_post(request: PostContentData):
+    print(request)
+    wp_client = Client(
+        request.wp_url,
+        request.wp_user_name,
+        request.wp_password,
+    )
+
+    post = WordPressPost()
+    post.title = request.title
+    post.content = request.content
+    post.post_status = request.status
+    print(post)
+    try:
+        # wp_client.call(NewPost(post))
+        post_id = wp_client.call(NewPost(post))
+        print(post_id)
+        return 'Post successfully created on WordPress'
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/wordpress/title_post")
 def create_wordpress_post_from_title(request: AutoPostRequest):
     llm = OpenAI(
         model_name=request.llm_config.model_name,
@@ -67,6 +97,10 @@ def create_wordpress_post_from_title(request: AutoPostRequest):
         template=request.llm_config.template,
     )
     llm_result = llm(prompt.format(title=request.post_data.title))
+
+    if request.post_data.status == 'check':
+        return llm_result
+
     wp_client = Client(
         request.post_data.wp_url,
         request.post_data.wp_user_name,
@@ -79,7 +113,8 @@ def create_wordpress_post_from_title(request: AutoPostRequest):
     post.post_status = request.post_data.status
 
     try:
+        # wp_client.call(NewPost(post))
         post_id = wp_client.call(NewPost(post))
-        return {"post_id": post_id, "message": "Post successfully created on WordPress"}
+        return llm_result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

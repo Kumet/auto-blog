@@ -1,9 +1,9 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
     Accordion,
     AccordionDetails,
-    AccordionSummary,
-    Button,
+    AccordionSummary, Box,
+    Button, CircularProgress,
     Container,
     FormControl,
     FormControlLabel,
@@ -12,10 +12,11 @@ import {
     Radio,
     RadioGroup,
     Select,
-    Slider,
+    Slider, Stack,
     TextField,
     Typography
 } from '@mui/material'
+import usePostData from '../utils/usePostData'
 
 
 interface PostData {
@@ -38,6 +39,15 @@ interface Request {
     llm_config: LLMConfig
 }
 
+interface WPRequest {
+    wp_url: ''
+    wp_user_name: string
+    wp_password: string
+    title: string
+    content: string
+    status: string
+}
+
 interface Option {
     value: string
     label: string
@@ -52,7 +62,7 @@ interface modelNameOption {
 }
 
 const siteOptions: Option[] = [
-    {value: 'https://finger-seo.com/', label: 'FingerSEO'},
+    {value: 'https://finger-seo.com/xmlrpc.php', label: 'FingerSEO'},
 ]
 
 const defaultTemplate: string = '「{title}」というテーマについて書いた記事をHTML形式でエンコーディングはutf-8で作成してください。記事の内容には以下のようなものが含まれます。\n\n   1. タイトルの説明\n   2. タイトルに関連するトピックの紹介\n   3. トピックについての詳細な説明\n   4. トピックに関連する統計データや事実の引用\n   5. 著者の見解や意見\n   6. 記事のまとめ\n\n   記事の長さは、約500〜1000ワードを目安にしてください。文法的に正しい文章を使用し、読みやすく分かりやすい文章を心がけてください。'
@@ -94,19 +104,30 @@ const Home: React.FC = () => {
             wp_url: '',
             wp_user_name: '',
             wp_password: '',
-            status: 'draft',
+            // status: 'draft',
+            status: 'check',
             title: '',
         },
         llm_config: {
-            model_name: 'text-davinci-003',
+            // model_name: 'text-davinci-003',
+            model_name: 'text-ada-001',
             temperature: 0.7,
-            max_tokens: 1024,
+            // max_tokens: 1024,
+            max_tokens: 100,
             template: defaultTemplate
         }
     }
     const [state, setState] = useState<Request>(initialState)
+    const [postData, {data, error, isLoading}] = usePostData<Request>()
+    const [wpPostData, wpResponse] = usePostData<WPRequest>()
+    const [isEdit, setIsEdit] = useState<boolean>(false)
+    const [contentData, setContentData] = useState<string | undefined>()
+    const [cancel, setCancel] = useState<boolean>(false)
+    const isFill = state.post_data.title === ''
+    const isCheck = data && state.post_data.status === 'check' && !cancel
     const selectedModel = modelNameOptions.find(modelName => modelName.value === state.llm_config.model_name)!
 
+    // request.post<Request>('/wordpress/test', state).then(res => console.log(res))
     const handleSiteChange = (event: { target: { value: any } }) => {
         const selectedUrl = event.target.value
         setState((prevState) => ({
@@ -175,6 +196,55 @@ const Home: React.FC = () => {
         }))
     }
 
+    const handleContentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const content = event.target.value
+        setContentData(content)
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setIsEdit(true)
+        setCancel(false)
+        await postData('/wordpress/title_post', state)
+    }
+
+    const handleContentSubmit = (status: 'draft' | 'publish' | 'cancel') => async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        const wpRequest: WPRequest = {
+                    wp_url: state.post_data.wp_url,
+                    wp_user_name: state.post_data.wp_user_name,
+                    wp_password: state.post_data.wp_password,
+                    title: state.post_data.title,
+                    content: contentData as string,
+                    status: status
+                }
+        console.log(wpRequest)
+        switch (status) {
+            case 'draft':
+            case 'publish':
+                await wpPostData('/wordpress/post', wpRequest)
+                break
+            case 'cancel':
+                setCancel(true)
+                setContentData('')
+                setIsEdit(false)
+                setState((prevState) => ({
+                    ...prevState,
+                    post_data: {
+                        ...prevState.post_data,
+                        title: '',
+                    },
+                }))
+                break
+        }
+    }
+
+    useEffect(() => {
+        if (data) {
+            setContentData(data)
+        }
+    }, [data])
+
 
     return (
         <React.Fragment>
@@ -221,6 +291,11 @@ const Home: React.FC = () => {
                         value={state.post_data.status}
                         onChange={handleStatusChange}
                     >
+                        <FormControlLabel
+                            value="check"
+                            control={<Radio/>}
+                            label="確認"
+                        />
                         <FormControlLabel
                             value="draft"
                             control={<Radio/>}
@@ -293,7 +368,6 @@ const Home: React.FC = () => {
                         sx={{maxWidth: '50%', margin: '0 auto'}}
                     />
 
-
                     <TextField
                         label="Template"
                         name="template"
@@ -303,18 +377,53 @@ const Home: React.FC = () => {
                         multiline
                     />
 
-
                     <TextField
                         label="Title"
                         name="title"
                         value={state.post_data.title}
                         onChange={handlePostDataChange}
-                        sx={{mt: 2, mb: 4}}
+                        sx={{mt: 2}}
+                        error={isFill}
                     />
 
-                    <Button variant="contained" color="primary">
-                        Submit
-                    </Button>
+                    <TextField
+                        label="Content"
+                        name="content"
+                        value={contentData}
+                        sx={{mt: 2, mb: 4}}
+                        multiline
+                        disabled={!isEdit}
+                        onChange={handleContentChange}
+                    />
+
+                    {isLoading &&
+                        <Box sx={{margin: '0 auto', my: 2}}>
+                            <CircularProgress/>
+                        </Box>
+                    }
+
+                    {isCheck ?
+                        <Stack direction="row" spacing={2} sx={{margin: '0 auto'}}>
+                            <Button variant="contained" color="primary" size="large"
+                                    onClick={handleContentSubmit('draft')}>
+                                下書き
+                            </Button>
+                            <Button variant="contained" color="secondary" size="large"
+                                    onClick={handleContentSubmit('publish')}>
+                                投稿
+                            </Button>
+                            <Button variant="contained" color="error" size="large"
+                                    onClick={handleContentSubmit('cancel')}>
+                                キャンセル
+                            </Button>
+                        </Stack>
+                        :
+                        <Button variant="contained" color="primary" disabled={isFill} onClick={handleSubmit}>
+                            Submit
+                        </Button>
+                    }
+                    {error && <Typography variant="body1" color="red">{error}</Typography>}
+
                 </FormControl>
             </Container>
         </React.Fragment>
