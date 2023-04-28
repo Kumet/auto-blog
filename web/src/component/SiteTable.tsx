@@ -85,13 +85,15 @@ const SiteTable: React.FC<SiteProps> = ({sites, onUpdate, onDelete}) => {
 
                             <TableCell>
                                 {editSiteId === site.id ? (
-                                    <Button variant="contained" color="primary" onClick={() => handleUpdate(site.id)}>
+                                    <Button variant="contained" color="primary" sx={{height: '56px'}}
+                                            onClick={() => handleUpdate(site.id)}>
                                         Save
                                     </Button>
                                 ) : (
                                     <Button
                                         variant="outlined"
                                         color="primary"
+                                        sx={{height: '56px'}}
                                         onClick={() => {
                                             setUrl(site.url)
                                             setUserName(site.user_name)
@@ -102,9 +104,12 @@ const SiteTable: React.FC<SiteProps> = ({sites, onUpdate, onDelete}) => {
                                         Edit
                                     </Button>
                                 )}
-                                <Button variant="outlined" color="error" onClick={() => onDelete(site.id)}>
-                                    Delete
-                                </Button>
+                                {editSiteId !== site.id &&
+                                    <Button variant="outlined" color="error" sx={{height: '56px', mx: 1}}
+                                            onClick={() => onDelete(site.id)}>
+                                        Delete
+                                    </Button>
+                                }
                             </TableCell>
                         </TableRow>
                     ))}

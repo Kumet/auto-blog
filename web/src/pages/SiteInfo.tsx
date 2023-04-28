@@ -48,14 +48,14 @@ const SiteInfo: React.FC = () => {
         <React.Fragment>
             <MyAppBar/>
             <Container maxWidth="md">
-                <Box>
+                <Box sx={{my: 2}}>
                     <Box>
-                        <TextField label="URL" value={newUrl} onChange={(e) => setNewUrl(e.target.value)}/>
-                        <TextField label="User Name" value={newUserName}
+                        <TextField label="URL" value={newUrl} sx={{mx: 1}} onChange={(e) => setNewUrl(e.target.value)}/>
+                        <TextField label="User Name" value={newUserName} sx={{mx: 1}}
                                    onChange={(e) => setNewUserName(e.target.value)}/>
-                        <TextField label="Password" value={newPassword}
+                        <TextField label="Password" value={newPassword} sx={{mx: 1}}
                                    onChange={(e) => setNewPassword(e.target.value)}/>
-                        <Button variant="contained" color="primary" onClick={handleAdd}>
+                        <Button variant="contained" color="primary" sx={{height: '56px'}} onClick={handleAdd}>
                             Add Site
                         </Button>
                     </Box>
