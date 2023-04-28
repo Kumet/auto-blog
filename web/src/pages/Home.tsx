@@ -17,6 +17,7 @@ import {
     Typography
 } from '@mui/material'
 import usePostData from '../utils/usePostData'
+import MyAppBar from '../component/AppBar'
 
 
 interface PostData {
@@ -249,6 +250,7 @@ const Home: React.FC = () => {
 
     return (
         <React.Fragment>
+            <MyAppBar/>
             <Container maxWidth={'md'}>
                 <h1>auto blog</h1>
                 <h2>blog settings</h2>
