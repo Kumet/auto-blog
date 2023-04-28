@@ -120,6 +120,7 @@ const Home: React.FC = () => {
     const [state, setState] = useState<Request>(initialState)
     const [postData, {data, error, isLoading}] = usePostData<Request>()
     const [wpPostData, wpResponse] = usePostData<WPRequest>()
+    const {data: wpData, error: wpError, isLoading: wpIsLoading} = wpResponse
     const [isEdit, setIsEdit] = useState<boolean>(false)
     const [contentData, setContentData] = useState<string | undefined>()
     const [cancel, setCancel] = useState<boolean>(false)
@@ -211,13 +212,13 @@ const Home: React.FC = () => {
     const handleContentSubmit = (status: 'draft' | 'publish' | 'cancel') => async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
         const wpRequest: WPRequest = {
-                    wp_url: state.post_data.wp_url,
-                    wp_user_name: state.post_data.wp_user_name,
-                    wp_password: state.post_data.wp_password,
-                    title: state.post_data.title,
-                    content: contentData as string,
-                    status: status
-                }
+            wp_url: state.post_data.wp_url,
+            wp_user_name: state.post_data.wp_user_name,
+            wp_password: state.post_data.wp_password,
+            title: state.post_data.title,
+            content: contentData as string,
+            status: status
+        }
         console.log(wpRequest)
         switch (status) {
             case 'draft':
@@ -225,18 +226,18 @@ const Home: React.FC = () => {
                 await wpPostData('/wordpress/post', wpRequest)
                 break
             case 'cancel':
-                setCancel(true)
-                setContentData('')
-                setIsEdit(false)
-                setState((prevState) => ({
-                    ...prevState,
-                    post_data: {
-                        ...prevState.post_data,
-                        title: '',
-                    },
-                }))
                 break
         }
+        setCancel(true)
+        setContentData('')
+        setIsEdit(false)
+        setState((prevState) => ({
+            ...prevState,
+            post_data: {
+                ...prevState.post_data,
+                title: '',
+            },
+        }))
     }
 
     useEffect(() => {
@@ -396,7 +397,7 @@ const Home: React.FC = () => {
                         onChange={handleContentChange}
                     />
 
-                    {isLoading &&
+                    {(isLoading || wpIsLoading ) &&
                         <Box sx={{margin: '0 auto', my: 2}}>
                             <CircularProgress/>
                         </Box>
@@ -422,7 +423,8 @@ const Home: React.FC = () => {
                             Submit
                         </Button>
                     }
-                    {error && <Typography variant="body1" color="red">{error}</Typography>}
+                    {wpData && <Typography variant='body1' color='success'>{wpData}</Typography>}
+                    {(error || wpError) && <Typography variant="body1" color="red">{error}</Typography>}
 
                 </FormControl>
             </Container>
