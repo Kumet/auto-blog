@@ -30,9 +30,8 @@ const MyAppBar = () => {
                     <Toolbar>
                         <Box sx={{display: 'flex'}}>
                             {pages.map((page) => (
-                                <Link to={page.path}>
+                                <Link to={page.path} key={page.label}>
                                     <Button
-                                        key={page.label}
                                         sx={{my: 2, color: 'white', display: 'block'}}
                                     >
                                         {page.label}

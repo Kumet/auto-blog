@@ -2,8 +2,10 @@ import React, {useEffect, useState} from 'react'
 import {
     Accordion,
     AccordionDetails,
-    AccordionSummary, Box,
-    Button, CircularProgress,
+    AccordionSummary,
+    Box,
+    Button,
+    CircularProgress,
     Container,
     FormControl,
     FormControlLabel,
@@ -12,16 +14,19 @@ import {
     Radio,
     RadioGroup,
     Select,
-    Slider, Stack,
+    Slider,
+    Stack,
     TextField,
     Typography
 } from '@mui/material'
 import usePostData from '../utils/usePostData'
 import MyAppBar from '../component/AppBar'
+import {Site as SiteType} from '../component/SiteTable'
+import api from '../utils/api'
 
 
 interface PostData {
-    wp_url: ''
+    wp_url: string
     wp_user_name: string
     wp_password: string
     title: string
@@ -41,17 +46,12 @@ interface Request {
 }
 
 interface WPRequest {
-    wp_url: ''
+    wp_url: string
     wp_user_name: string
     wp_password: string
     title: string
     content: string
     status: string
-}
-
-interface Option {
-    value: string
-    label: string
 }
 
 interface modelNameOption {
@@ -62,9 +62,6 @@ interface modelNameOption {
     description: string
 }
 
-const siteOptions: Option[] = [
-    {value: 'https://finger-seo.com/xmlrpc.php', label: 'FingerSEO'},
-]
 
 const defaultTemplate: string = '「{title}」というテーマについて書いた記事をHTML形式でエンコーディングはutf-8で作成してください。記事の内容には以下のようなものが含まれます。\n\n   1. タイトルの説明\n   2. タイトルに関連するトピックの紹介\n   3. トピックについての詳細な説明\n   4. トピックに関連する統計データや事実の引用\n   5. 著者の見解や意見\n   6. 記事のまとめ\n\n   記事の長さは、約500〜1000ワードを目安にしてください。文法的に正しい文章を使用し、読みやすく分かりやすい文章を心がけてください。'
 
@@ -119,6 +116,7 @@ const Home: React.FC = () => {
         }
     }
     const [state, setState] = useState<Request>(initialState)
+    const [sites, setSites] = useState<SiteType[]>([])
     const [postData, {data, error, isLoading}] = usePostData<Request>()
     const [wpPostData, wpResponse] = usePostData<WPRequest>()
     const {data: wpData, error: wpError, isLoading: wpIsLoading} = wpResponse
@@ -129,14 +127,16 @@ const Home: React.FC = () => {
     const isCheck = data && state.post_data.status === 'check' && !cancel
     const selectedModel = modelNameOptions.find(modelName => modelName.value === state.llm_config.model_name)!
 
-    // request.post<Request>('/wordpress/test', state).then(res => console.log(res))
     const handleSiteChange = (event: { target: { value: any } }) => {
-        const selectedUrl = event.target.value
+        const selectedSite: SiteType = sites.find(site => site.url === event.target.value)!
         setState((prevState) => ({
             ...prevState,
             post_data: {
                 ...prevState.post_data,
-                wp_url: selectedUrl,
+                // wp_url: `${selectedSite.url}/xmlrpc.php`,
+                wp_url: selectedSite.url,
+                wp_user_name: selectedSite.user_name,
+                wp_password: selectedSite.password,
             },
         }))
     }
@@ -247,12 +247,19 @@ const Home: React.FC = () => {
         }
     }, [data])
 
+    useEffect(() => {
+        const fetchSites = async () => {
+            const response = await api.get<SiteType[]>('/site_info')
+            setSites(response.data)
+        }
+        fetchSites()
+    }, [])
+
 
     return (
         <React.Fragment>
             <MyAppBar/>
             <Container maxWidth={'md'}>
-                <h1>auto blog</h1>
                 <h2>blog settings</h2>
                 <FormControl fullWidth>
                     <FormControl fullWidth>
@@ -260,33 +267,34 @@ const Home: React.FC = () => {
                         <Select
                             labelId="url-label"
                             id="url"
+                            // defaultValue={1}
                             value={state.post_data.wp_url}
                             label="Site"
                             onChange={handleSiteChange}
                         >
-                            {siteOptions.map((option) => (
-                                <MenuItem key={option.label} value={option.value}>
-                                    {option.label}
+                            {sites.map((site) => (
+                                <MenuItem key={site.id} value={site.url}>
+                                    {site.url}
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
 
-                    <TextField
-                        label="User Name"
-                        name="wp_user_name"
-                        value={state.post_data.wp_user_name}
-                        onChange={handlePostDataChange}
-                        sx={{mt: 2}}
-                    />
-                    <TextField
-                        label="Password"
-                        name="wp_password"
-                        value={state.post_data.wp_password}
-                        onChange={handlePostDataChange}
-                        type="password"
-                        sx={{mt: 2}}
-                    />
+                    {/*<TextField*/}
+                    {/*    label="User Name"*/}
+                    {/*    name="wp_user_name"*/}
+                    {/*    value={state.post_data.wp_user_name}*/}
+                    {/*    onChange={handlePostDataChange}*/}
+                    {/*    sx={{mt: 2}}*/}
+                    {/*/>*/}
+                    {/*<TextField*/}
+                    {/*    label="Password"*/}
+                    {/*    name="wp_password"*/}
+                    {/*    value={state.post_data.wp_password}*/}
+                    {/*    onChange={handlePostDataChange}*/}
+                    {/*    type="password"*/}
+                    {/*    sx={{mt: 2}}*/}
+                    {/*/>*/}
 
                     <RadioGroup
                         row
@@ -399,7 +407,7 @@ const Home: React.FC = () => {
                         onChange={handleContentChange}
                     />
 
-                    {(isLoading || wpIsLoading ) &&
+                    {(isLoading || wpIsLoading) &&
                         <Box sx={{margin: '0 auto', my: 2}}>
                             <CircularProgress/>
                         </Box>
@@ -425,7 +433,7 @@ const Home: React.FC = () => {
                             Submit
                         </Button>
                     }
-                    {wpData && <Typography variant='body1' color='success'>{wpData}</Typography>}
+                    {wpData && <Typography variant="body1" color="success">{wpData}</Typography>}
                     {(error || wpError) && <Typography variant="body1" color="red">{error}</Typography>}
 
                 </FormControl>
