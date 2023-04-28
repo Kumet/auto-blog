@@ -260,7 +260,7 @@ const Home: React.FC = () => {
         <React.Fragment>
             <MyAppBar/>
             <Container maxWidth={'md'}>
-                <h2>blog settings</h2>
+                <h2>Settings</h2>
                 <FormControl fullWidth>
                     <FormControl fullWidth>
                         <InputLabel id="url-label">Site</InputLabel>
@@ -280,27 +280,12 @@ const Home: React.FC = () => {
                         </Select>
                     </FormControl>
 
-                    {/*<TextField*/}
-                    {/*    label="User Name"*/}
-                    {/*    name="wp_user_name"*/}
-                    {/*    value={state.post_data.wp_user_name}*/}
-                    {/*    onChange={handlePostDataChange}*/}
-                    {/*    sx={{mt: 2}}*/}
-                    {/*/>*/}
-                    {/*<TextField*/}
-                    {/*    label="Password"*/}
-                    {/*    name="wp_password"*/}
-                    {/*    value={state.post_data.wp_password}*/}
-                    {/*    onChange={handlePostDataChange}*/}
-                    {/*    type="password"*/}
-                    {/*    sx={{mt: 2}}*/}
-                    {/*/>*/}
-
                     <RadioGroup
                         row
                         name="status"
                         value={state.post_data.status}
                         onChange={handleStatusChange}
+                        sx={{mt: 2}}
                     >
                         <FormControlLabel
                             value="check"
@@ -319,8 +304,7 @@ const Home: React.FC = () => {
                         />
                     </RadioGroup>
 
-                    <h2>AI Settings</h2>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth sx={{mt: 2}}>
                         <InputLabel id="model-name-label">Model Name</InputLabel>
                         <Select
                             labelId="model-name-label"
