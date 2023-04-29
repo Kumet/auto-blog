@@ -7,6 +7,11 @@ import {
     Button,
     CircularProgress,
     Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     FormControl,
     FormControlLabel,
     InputLabel,
@@ -23,6 +28,7 @@ import usePostData from '../utils/usePostData'
 import MyAppBar from '../component/AppBar'
 import {Site as SiteType} from '../component/SiteTable'
 import api from '../utils/api'
+import useTemplates, {Template} from '../utils/useTemplate'
 
 
 interface PostData {
@@ -126,6 +132,10 @@ const Home: React.FC = () => {
     const isFill = state.post_data.title === ''
     const isCheck = data && state.post_data.status === 'check' && !cancel
     const selectedModel = modelNameOptions.find(modelName => modelName.value === state.llm_config.model_name)!
+    const [currentTemplate, setCurrentTemplate] = useState<Omit<Template, 'id'>>({content: '', label: ''})
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null)
+    const {templates, fetchTemplates, createTemplate} = useTemplates()
 
     const handleSiteChange = (event: { target: { value: any } }) => {
         const selectedSite: SiteType = sites.find(site => site.url === event.target.value)!
@@ -203,6 +213,25 @@ const Home: React.FC = () => {
         setContentData(content)
     }
 
+    const handleSelectTemplate = (event: { target: { value: any } }) => {
+        const selectedTemplate: Template = templates.find(template => template.id === event.target.value)!
+        setSelectedTemplateId(selectedTemplate.id)
+        setState((prevState) => ({
+            ...prevState,
+            llm_config: {
+                ...prevState.llm_config,
+                template: selectedTemplate.content,
+            },
+        }))
+    }
+
+    const handleChangeCurrentTemplate = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCurrentTemplate((prev) => ({
+            ...prev!,
+            [e.target.name]: e.target.value,
+        }))
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsEdit(true)
@@ -241,6 +270,22 @@ const Home: React.FC = () => {
         }))
     }
 
+    const handleDialogOpen = () => {
+        setCurrentTemplate((prev) => ({
+            ...prev!,
+            content: state.llm_config.template,
+        }))
+        setDialogOpen(true)
+    }
+    const handleDialogClose = () => {
+        setDialogOpen(false)
+    }
+
+    const handleSaveTemplate = () => {
+        createTemplate(currentTemplate!)
+        setDialogOpen(false)
+    }
+
     useEffect(() => {
         if (data) {
             setContentData(data)
@@ -254,6 +299,16 @@ const Home: React.FC = () => {
         }
         fetchSites()
     }, [])
+
+    useEffect(() => {
+        fetchTemplates()
+    }, [fetchTemplates])
+
+    useEffect(() => {
+        if (templates.length !== 0) {
+            setSelectedTemplateId(templates[0].id)
+        }
+    }, [templates])
 
 
     return (
@@ -363,6 +418,23 @@ const Home: React.FC = () => {
                         sx={{maxWidth: '50%', margin: '0 auto'}}
                     />
 
+                    <FormControl fullWidth>
+                        <InputLabel id="template-select">template select</InputLabel>
+                        <Select
+                            labelId="template-select"
+                            id="template-select"
+                            value={selectedTemplateId || ''}
+                            label="template select"
+                            onChange={handleSelectTemplate}
+                        >
+                            {templates.map((template) => (
+                                <MenuItem key={template.id} value={template.id ?? ''}>
+                                    {template.label}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
                     <TextField
                         label="Template"
                         name="template"
@@ -371,6 +443,8 @@ const Home: React.FC = () => {
                         sx={{mt: 2}}
                         multiline
                     />
+
+                    <Button onClick={handleDialogOpen}>Save Template</Button>
 
                     <TextField
                         label="Title"
@@ -419,6 +493,40 @@ const Home: React.FC = () => {
                     }
                     {wpData && <Typography variant="body1" color="success">{wpData}</Typography>}
                     {(error || wpError) && <Typography variant="body1" color="red">{error}</Typography>}
+
+                    <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                        <DialogTitle>Save Template</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>Enter template information:</DialogContentText>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                name="label"
+                                label="Label"
+                                fullWidth
+                                value={currentTemplate?.label || ''}
+                                onChange={handleChangeCurrentTemplate}
+                            />
+                            <TextField
+                                margin="dense"
+                                name="content"
+                                label="Content"
+                                fullWidth
+                                multiline
+                                value={currentTemplate?.content || ''}
+                                onChange={handleChangeCurrentTemplate}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleDialogClose}>Cancel</Button>
+                            <Button
+                                disabled={currentTemplate.label === '' || currentTemplate.content === ''}
+                                onClick={handleSaveTemplate}
+                            >
+                                Save
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
                 </FormControl>
             </Container>
