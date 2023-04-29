@@ -24,10 +24,10 @@ import {
     TextField,
     Typography
 } from '@mui/material'
-import usePostData from '../utils/usePostData'
+import usePostData from '../hooks/usePostData'
 import MyAppBar from '../component/AppBar'
 import api from '../utils/api'
-import useTemplates, {Template} from '../utils/useTemplate'
+import useTemplates, {Template} from '../hooks/useTemplate'
 import {modelNameOption, Request, WPRequest, Site as SiteType} from '../interfaces'
 
 

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import useTemplates, {Template} from '../utils/useTemplate'
+import useTemplates, {Template} from '../hooks/useTemplate'
 import {
     Box,
     Button, Container,
