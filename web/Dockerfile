@@ -7,6 +7,7 @@ COPY . .
 
 RUN npm install
 RUN npm install @mui/material @emotion/react @emotion/styled
+RUN npm install @mui/icons-material
 RUN npm install axios
 RUN npm install react-router-dom
 

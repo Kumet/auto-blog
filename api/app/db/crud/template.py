@@ -4,7 +4,7 @@ from db import models, schemas
 
 
 def create_template(db: Session, template: schemas.Template):
-    db_template = models.SiteInfo(**template.dict())
+    db_template = models.Template(**template.dict())
     db.add(db_template)
     db.commit()
     db.refresh(db_template)
@@ -12,7 +12,7 @@ def create_template(db: Session, template: schemas.Template):
 
 
 def get_template(db: Session, template_id: int):
-    return db.query(models.SiteInfo).filter(models.Template.id == template_id).first()
+    return db.query(models.Template).filter(models.Template.id == template_id).first()
 
 
 def get_templates(db: Session, skip: int = 0, limit: int = 10):
