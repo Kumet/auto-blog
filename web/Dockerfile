@@ -5,7 +5,7 @@ WORKDIR /web
 COPY package*.json ./
 
 RUN npm install
-
+RUN npm install react
 RUN npm install @mui/material @emotion/react @emotion/styled
 RUN npm install axios
 RUN npm install react-router-dom
