@@ -1,5 +1,5 @@
 import {useCallback, useState} from 'react'
-import api from './api'
+import api from '../utils/api'
 import {AxiosError} from 'axios'
 
 interface ApiResponse<T> {

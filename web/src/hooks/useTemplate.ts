@@ -1,5 +1,5 @@
 import {useCallback, useState} from 'react'
-import api from './api'
+import api from '../utils/api'
 
 
 export interface Template {
