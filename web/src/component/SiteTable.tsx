@@ -1,18 +1,6 @@
 import React, {useState} from 'react'
 import {Box, Button, Table, TableBody, TableCell, TableHead, TableRow, TextField,} from '@mui/material'
-
-export interface Site {
-    id: number;
-    url: string;
-    user_name: string;
-    password: string;
-}
-
-interface SiteProps {
-    sites: Site[];
-    onUpdate: (id: number, url: string, user_name: string, password: string) => void;
-    onDelete: (id: number) => void;
-}
+import {SiteProps} from '../interfaces'
 
 const SiteTable: React.FC<SiteProps> = ({sites, onUpdate, onDelete}) => {
     const [editSiteId, setEditSiteId] = useState<number | null>(null)

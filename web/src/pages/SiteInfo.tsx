@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import {Box, Button, Container, TextField} from '@mui/material'
-import SiteTable, {Site as SiteType} from '../component/SiteTable'
+import SiteTable from '../component/SiteTable'
 import api from '../utils/api'
 import MyAppBar from '../component/AppBar'
+import {Site as SiteType} from '../interfaces'
 
 const SiteInfo: React.FC = () => {
     const [sites, setSites] = useState<SiteType[]>([])

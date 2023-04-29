@@ -5,7 +5,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Button from '@mui/material/Button'
 import {createTheme, Stack, ThemeProvider} from '@mui/material'
 import {Link} from 'react-router-dom'
-
+import {Page} from '../interfaces'
 
 const darkTheme = createTheme({
     palette: {
@@ -16,10 +16,6 @@ const darkTheme = createTheme({
     },
 })
 
-interface Page {
-    label: string
-    path: string
-}
 
 const pages: Page[] = [
     {label: 'home', path: '/'},

@@ -26,47 +26,9 @@ import {
 } from '@mui/material'
 import usePostData from '../utils/usePostData'
 import MyAppBar from '../component/AppBar'
-import {Site as SiteType} from '../component/SiteTable'
 import api from '../utils/api'
 import useTemplates, {Template} from '../utils/useTemplate'
-
-
-interface PostData {
-    wp_url: string
-    wp_user_name: string
-    wp_password: string
-    title: string
-    status: string
-}
-
-interface LLMConfig {
-    model_name: string
-    template: string
-    temperature: number
-    max_tokens: number
-}
-
-interface Request {
-    post_data: PostData
-    llm_config: LLMConfig
-}
-
-interface WPRequest {
-    wp_url: string
-    wp_user_name: string
-    wp_password: string
-    title: string
-    content: string
-    status: string
-}
-
-interface modelNameOption {
-    value: string
-    label: string
-    max_tokens: number
-    pricing: string
-    description: string
-}
+import {modelNameOption, Request, WPRequest, Site as SiteType} from '../interfaces'
 
 
 const defaultTemplate: string = '「{title}」というテーマについて書いた記事をHTML形式でエンコーディングはutf-8で作成してください。記事の内容には以下のようなものが含まれます。\n\n   1. タイトルの説明\n   2. タイトルに関連するトピックの紹介\n   3. トピックについての詳細な説明\n   4. トピックに関連する統計データや事実の引用\n   5. 著者の見解や意見\n   6. 記事のまとめ\n\n   記事の長さは、約500〜1000ワードを目安にしてください。文法的に正しい文章を使用し、読みやすく分かりやすい文章を心がけてください。'
