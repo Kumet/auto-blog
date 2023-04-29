@@ -1,20 +1,23 @@
 import React, {useState} from 'react'
 import {Box, Button, Table, TableBody, TableCell, TableHead, TableRow, TextField,} from '@mui/material'
-import {SiteProps} from '../interfaces'
+import {Site, SiteProps} from '../interfaces'
 
 const SiteTable: React.FC<SiteProps> = ({sites, onUpdate, onDelete}) => {
-    const [editSiteId, setEditSiteId] = useState<number | null>(null)
-    const [url, setUrl] = useState('')
-    const [user_name, setUserName] = useState('')
-    const [password, setPassword] = useState('')
+    const [editSite, setEditSite] = useState<Site | null>(null)
     const [showPassword, setShowPassword] = useState<number | null>(null)
 
-    const handleUpdate = (id: number) => {
-        onUpdate(id, url, user_name, password)
-        setUrl('')
-        setUserName('')
-        setPassword('')
-        setEditSiteId(null)
+    const handleUpdate = () => {
+        if (editSite) {
+            onUpdate(editSite)
+            setEditSite(null)
+        }
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEditSite((prev) => ({
+            ...prev!,
+            [e.target.name]: e.target.value
+        }))
     }
 
     return (
@@ -32,11 +35,12 @@ const SiteTable: React.FC<SiteProps> = ({sites, onUpdate, onDelete}) => {
                     {sites.map((site) => (
                         <TableRow key={site.id}>
                             <TableCell>
-                                {editSiteId === site.id ? (
+                                {editSite?.id === site.id ? (
                                     <TextField
                                         fullWidth
-                                        value={url}
-                                        onChange={(e) => setUrl(e.target.value)}
+                                        name="url"
+                                        value={editSite.url}
+                                        onChange={handleChange}
                                         autoFocus
                                     />
                                 ) : (
@@ -44,22 +48,24 @@ const SiteTable: React.FC<SiteProps> = ({sites, onUpdate, onDelete}) => {
                                 )}
                             </TableCell>
                             <TableCell>
-                                {editSiteId === site.id ? (
+                                {editSite?.id === site.id ? (
                                     <TextField
                                         fullWidth
-                                        value={user_name}
-                                        onChange={(e) => setUserName(e.target.value)}
+                                        name="user_name"
+                                        value={editSite.user_name}
+                                        onChange={handleChange}
                                     />
                                 ) : (
                                     site.user_name
                                 )}
                             </TableCell>
                             <TableCell>
-                                {editSiteId === site.id ? (
+                                {editSite?.id === site.id ? (
                                     <TextField
                                         fullWidth
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        name="password"
+                                        value={editSite.password}
+                                        onChange={handleChange}
                                     />
                                 ) : (
                                     <span
@@ -72,9 +78,9 @@ const SiteTable: React.FC<SiteProps> = ({sites, onUpdate, onDelete}) => {
                             </TableCell>
 
                             <TableCell>
-                                {editSiteId === site.id ? (
+                                {editSite?.id === site.id ? (
                                     <Button variant="contained" color="primary" sx={{height: '56px'}}
-                                            onClick={() => handleUpdate(site.id)}>
+                                            onClick={handleUpdate}>
                                         Save
                                     </Button>
                                 ) : (
@@ -82,17 +88,12 @@ const SiteTable: React.FC<SiteProps> = ({sites, onUpdate, onDelete}) => {
                                         variant="outlined"
                                         color="primary"
                                         sx={{height: '56px'}}
-                                        onClick={() => {
-                                            setUrl(site.url)
-                                            setUserName(site.user_name)
-                                            setPassword(site.password)
-                                            setEditSiteId(site.id)
-                                        }}
+                                        onClick={() => {setEditSite(site)}}
                                     >
                                         Edit
                                     </Button>
                                 )}
-                                {editSiteId !== site.id &&
+                                {editSite?.id !== site.id &&
                                     <Button variant="outlined" color="error" sx={{height: '56px', mx: 1}}
                                             onClick={() => onDelete(site.id)}>
                                         Delete

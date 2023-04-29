@@ -27,8 +27,8 @@ import {
 import usePostData from '../hooks/usePostData'
 import MyAppBar from '../component/AppBar'
 import api from '../utils/api'
-import useTemplates, {Template} from '../hooks/useTemplate'
-import {modelNameOption, Request, WPRequest, Site as SiteType} from '../interfaces'
+import useTemplates from '../hooks/useTemplate'
+import {modelNameOption, Request, WPRequest, Site, Template} from '../interfaces'
 
 
 const defaultTemplate: string = '「{title}」というテーマについて書いた記事をHTML形式でエンコーディングはutf-8で作成してください。記事の内容には以下のようなものが含まれます。\n\n   1. タイトルの説明\n   2. タイトルに関連するトピックの紹介\n   3. トピックについての詳細な説明\n   4. トピックに関連する統計データや事実の引用\n   5. 著者の見解や意見\n   6. 記事のまとめ\n\n   記事の長さは、約500〜1000ワードを目安にしてください。文法的に正しい文章を使用し、読みやすく分かりやすい文章を心がけてください。'
@@ -84,7 +84,7 @@ const Home: React.FC = () => {
         }
     }
     const [state, setState] = useState<Request>(initialState)
-    const [sites, setSites] = useState<SiteType[]>([])
+    const [sites, setSites] = useState<Site[]>([])
     const [postData, {data, error, isLoading}] = usePostData<Request>()
     const [wpPostData, wpResponse] = usePostData<WPRequest>()
     const {data: wpData, error: wpError, isLoading: wpIsLoading} = wpResponse
@@ -100,7 +100,7 @@ const Home: React.FC = () => {
     const {templates, fetchTemplates, createTemplate} = useTemplates()
 
     const handleSiteChange = (event: { target: { value: any } }) => {
-        const selectedSite: SiteType = sites.find(site => site.url === event.target.value)!
+        const selectedSite: Site = sites.find(site => site.url === event.target.value)!
         setState((prevState) => ({
             ...prevState,
             post_data: {
@@ -256,7 +256,7 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         const fetchSites = async () => {
-            const response = await api.get<SiteType[]>('/site_info')
+            const response = await api.get<Site[]>('/site_info')
             setSites(response.data)
         }
         fetchSites()

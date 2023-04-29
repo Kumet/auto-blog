@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import useTemplates, {Template} from '../hooks/useTemplate'
+import useTemplates from '../hooks/useTemplate'
 import {
     Box,
     Button, Container,
@@ -21,6 +21,7 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MyAppBar from '../component/AppBar'
+import {Template} from '../interfaces'
 
 const TemplateList: React.FC = () => {
     const {templates, fetchTemplates, createTemplate, updateTemplate, deleteTemplate} = useTemplates()

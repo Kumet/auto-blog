@@ -1,3 +1,9 @@
+export interface ApiResponse<T> {
+    data?: T
+    error?: string
+    isLoading: boolean
+}
+
 export interface Page {
     label: string
     path: string
@@ -12,7 +18,7 @@ export interface Site {
 
 export interface SiteProps {
     sites: Site[];
-    onUpdate: (id: number, url: string, user_name: string, password: string) => void;
+    onUpdate: (site: Site) => void;
     onDelete: (id: number) => void;
 }
 
@@ -52,3 +58,10 @@ export interface modelNameOption {
     pricing: string
     description: string
 }
+
+export interface Template {
+    id: number;
+    label: string;
+    content: string;
+}
+

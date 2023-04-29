@@ -1,12 +1,7 @@
 import {useCallback, useState} from 'react'
 import api from '../utils/api'
+import {Template} from '../interfaces'
 
-
-export interface Template {
-    id: number;
-    label: string;
-    content: string;
-}
 
 const useTemplates = () => {
     const [templates, setTemplates] = useState<Template[]>([])
