@@ -81,6 +81,7 @@ const TemplateList: React.FC = () => {
         <React.Fragment>
             <MyAppBar/>
             <Container maxWidth="md">
+                <h2>Template</h2>
                 <Box>
                     <List>
                         {templates.map((template) => (

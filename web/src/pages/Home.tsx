@@ -29,11 +29,13 @@ import MyAppBar from '../component/AppBar'
 import api from '../utils/api'
 import useTemplates from '../hooks/useTemplate'
 import {modelNameOption, Request, WPRequest, Site, Template} from '../interfaces'
+import useSettings from '../hooks/useSettings'
+import useSite from '../hooks/useSite'
 
 
 const defaultTemplate: string = '「{title}」というテーマについて書いた記事をHTML形式でエンコーディングはutf-8で作成してください。記事の内容には以下のようなものが含まれます。\n\n   1. タイトルの説明\n   2. タイトルに関連するトピックの紹介\n   3. トピックについての詳細な説明\n   4. トピックに関連する統計データや事実の引用\n   5. 著者の見解や意見\n   6. 記事のまとめ\n\n   記事の長さは、約500〜1000ワードを目安にしてください。文法的に正しい文章を使用し、読みやすく分かりやすい文章を心がけてください。'
 
-const modelNameOptions: modelNameOption[] = [
+export const modelNameOptions: modelNameOption[] = [
     {
         value: 'text-davinci-003',
         label: 'text-davinci-003',
@@ -82,7 +84,6 @@ const Home: React.FC = () => {
         }
     }
     const [state, setState] = useState<Request>(initialState)
-    const [sites, setSites] = useState<Site[]>([])
     const [postData, {data, error, isLoading}] = usePostData<Request>()
     const [wpPostData, wpResponse] = usePostData<WPRequest>()
     const {data: wpData, error: wpError, isLoading: wpIsLoading} = wpResponse
@@ -96,6 +97,8 @@ const Home: React.FC = () => {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null)
     const {templates, fetchTemplates, createTemplate} = useTemplates()
+    const {sites, fetchSites} = useSite()
+    const {settings, fetchSettings} = useSettings()
 
     const handleSiteChange = (event: { target: { value: any } }) => {
         const selectedSite: Site = sites.find(site => site.url === event.target.value)!
@@ -103,7 +106,6 @@ const Home: React.FC = () => {
             ...prevState,
             post_data: {
                 ...prevState.post_data,
-                // wp_url: `${selectedSite.url}/xmlrpc.php`,
                 wp_url: selectedSite.url,
                 wp_user_name: selectedSite.user_name,
                 wp_password: selectedSite.password,
@@ -209,7 +211,6 @@ const Home: React.FC = () => {
             content: contentData as string,
             status: status
         }
-        console.log(wpRequest)
         switch (status) {
             case 'draft':
             case 'publish':
@@ -253,16 +254,31 @@ const Home: React.FC = () => {
     }, [data])
 
     useEffect(() => {
-        const fetchSites = async () => {
-            const response = await api.get<Site[]>('/site_info')
-            setSites(response.data)
+        if (settings.length !== 0) {
+            const defaultSettings = settings[0]
+            setState({
+                post_data: {
+                    wp_url: defaultSettings.site_info.url,
+                    wp_user_name: defaultSettings.site_info.user_name,
+                    wp_password: defaultSettings.site_info.password,
+                    status: defaultSettings.status,
+                    title: ''
+                },
+                llm_config: {
+                    max_tokens: defaultSettings.max_tokens,
+                    template: defaultSettings.template.content,
+                    temperature: defaultSettings.temperature,
+                    model_name: defaultSettings.model_name,
+                },
+            })
         }
-        fetchSites()
-    }, [])
+    }, [settings])
 
     useEffect(() => {
+        fetchSites()
         fetchTemplates()
-    }, [fetchTemplates])
+        fetchSettings()
+    }, [fetchSites, fetchTemplates, fetchSettings])
 
     useEffect(() => {
         if (templates.length !== 0) {
@@ -275,7 +291,7 @@ const Home: React.FC = () => {
         <React.Fragment>
             <MyAppBar/>
             <Container maxWidth={'md'}>
-                <h2>Settings</h2>
+                <h2>Home</h2>
                 <FormControl fullWidth>
                     <FormControl fullWidth>
                         <InputLabel id="url-label">Site</InputLabel>
