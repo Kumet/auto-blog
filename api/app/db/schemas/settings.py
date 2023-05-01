@@ -1,6 +1,7 @@
 from typing import Literal
 
 from pydantic import BaseModel
+
 from db.schemas.site_info import SiteInfo
 from db.schemas.template import Template
 

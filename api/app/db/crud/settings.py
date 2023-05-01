@@ -10,7 +10,7 @@ def create_settings(db: Session, settings: schemas.SettingsCreate):
         temperature=settings.temperature,
         max_tokens=settings.max_tokens,
         site_info_id=settings.site_info.id,
-        template_id=settings.template.id
+        template_id=settings.template.id,
     )
     db.add(db_settings)
     db.commit()
