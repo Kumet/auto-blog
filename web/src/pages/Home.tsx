@@ -75,11 +75,9 @@ const Home: React.FC = () => {
             title: '',
         },
         llm_config: {
-            // model_name: 'text-davinci-003',
-            model_name: 'text-ada-001',
+            model_name: 'text-davinci-003',
             temperature: 0.7,
-            // max_tokens: 1024,
-            max_tokens: 100,
+            max_tokens: 3500,
             template: defaultTemplate
         }
     }
