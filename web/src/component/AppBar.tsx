@@ -21,6 +21,7 @@ const pages: Page[] = [
     {label: 'home', path: '/'},
     {label: 'site info', path: '/site'},
     {label: 'template', path: '/template'},
+    {label: 'settings', path: '/settings'},
 ]
 
 const MyAppBar = () => {

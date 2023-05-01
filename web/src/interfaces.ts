@@ -65,3 +65,12 @@ export interface Template {
     content: string;
 }
 
+export interface Settings {
+    id: number
+    site_info: Site
+    template: Template
+    status: string
+    model_name: string
+    temperature: number
+    max_tokens: number
+}

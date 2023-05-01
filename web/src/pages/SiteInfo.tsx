@@ -39,6 +39,7 @@ const SiteInfo: React.FC = () => {
         <React.Fragment>
             <MyAppBar/>
             <Container maxWidth="md">
+                <h2>Site Info</h2>
                 <Box sx={{my: 2}}>
                     <Box>
                         <TextField label="URL" value={currentSite?.url} sx={{mx: 1}} name="url"
