@@ -14,11 +14,11 @@ class SettingsBase(BaseModel):
     template: Template
 
 
-class SettingsCreate(BaseModel):
+class SettingsCreate(SettingsBase):
     pass
 
 
-class SettingsUpdate(BaseModel):
+class SettingsUpdate(SettingsBase):
     pass
 
 
