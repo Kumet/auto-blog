@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.endpoints import ai, site_info, template, wordpress
+from api.endpoints import ai, settings, site_info, template, wordpress
 from db.database import Base, engine
 
 app = FastAPI()
@@ -30,3 +30,4 @@ app.include_router(wordpress.router)
 app.include_router(ai.router)
 app.include_router(site_info.router)
 app.include_router(template.router)
+app.include_router(settings.router)
