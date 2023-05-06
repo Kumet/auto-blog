@@ -54,3 +54,13 @@ def sentence_to_html(sentence: str) -> str:
         template=template,
     )
     return llm(prompt.format(sentence=sentence))
+
+@router.get('/ai/description')
+def get_description(product_name: str) -> str:
+    template = """コストコの商品の{product_name}について100~150文字で説明してください。"""
+    llm = OpenAI(model_name="text-davinci-003")
+    prompt = PromptTemplate(
+        input_variables=["product_name"],
+        template=template,
+    )
+    return llm(prompt.format(product_name=product_name))
